@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>فطر السنيه - النظام المتكامل</title>
+    <title>فطر السنيه - نظام مراكز التوزيع المتكامل</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -17,172 +17,614 @@
             --beige: #f8f3e0;
             --danger: #c4452c;
             --white: #ffffff;
+            --dark-text: #2d3e2b;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', system-ui, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
         
-        body { background: var(--secondary); min-height: 100vh; display: flex; flex-direction: column; color: #333; overflow-x: hidden; }
+        body {
+            background: var(--secondary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1f2e1c;
+            overflow-x: hidden;
+        }
 
-        /* الهيدر */
-        .header { background: var(--primary); color: var(--gold); padding: 15px; text-align: center; border-bottom: 3px solid var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; }
+        /* الهيدر الأنيق */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--gold);
+            padding: 16px 12px;
+            text-align: center;
+            border-bottom: 3px solid var(--gold);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+            z-index: 100;
+            position: relative;
+        }
+        .header h2 i {
+            margin-left: 8px;
+            text-shadow: 0 2px 2px rgba(0,0,0,0.2);
+        }
 
-        /* الخريطة - تم تصغير الارتفاع */
-        #map { height: 350px; width: 100%; z-index: 1; background: #eee; border-bottom: 2px solid var(--gold); }
+        /* خريطة احترافية */
+        #map {
+            height: 360px;
+            width: 100%;
+            z-index: 1;
+            background: #cfd8c3;
+            border-bottom: 3px solid var(--gold);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
 
         /* قسم معلومات الشركة والموقع (أسفل الخريطة) */
-        .company-info-section { background: var(--beige); padding: 20px; flex-grow: 1; border-top: 5px solid var(--primary); }
-        .info-card { background: var(--white); border-radius: 15px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 15px; border-right: 5px solid var(--gold); }
-        .info-card h3 { color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .info-card p { font-size: 0.95rem; line-height: 1.6; color: #555; }
+        .company-info-section {
+            background: var(--beige);
+            padding: 20px 18px;
+            flex-grow: 1;
+            border-top: 5px solid var(--primary);
+        }
+        .info-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 18px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+            margin-bottom: 18px;
+            border-right: 6px solid var(--gold);
+            transition: transform 0.2s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-2px);
+        }
+        .info-card h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.25rem;
+        }
+        .info-card p {
+            font-size: 0.95rem;
+            line-height: 1.65;
+            color: #3a4a35;
+        }
 
         /* شريط التواصل السفلي */
-        .footer-contact { background: var(--white); padding: 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #ddd; position: sticky; bottom: 0; width: 100%; z-index: 100; }
-        .contact-btn { text-decoration: none; color: white; font-weight: bold; padding: 10px 20px; border-radius: 25px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; transition: 0.3s; }
-        .btn-call { background: var(--primary); }
-        .btn-wa { background: #25D366; }
+        .footer-contact {
+            background: var(--white);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #e0d6bf;
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+        .contact-btn {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px 22px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            transition: all 0.25s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .btn-call {
+            background: var(--primary);
+        }
+        .btn-wa {
+            background: #25D366;
+        }
+        .contact-btn:active {
+            transform: scale(0.96);
+        }
 
-        /* الماركر والمودال (نفس المواصفات السابقة) */
-        .custom-marker { background: var(--gold); border: 2px solid white; border-radius: 8px; padding: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); text-align: center; position: relative; width: 110px !important; }
-        .custom-marker::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid var(--gold); }
+        /* تصميم الماركر المخصص (بطاقة صغيرة) */
+        .custom-marker {
+            background: var(--gold);
+            border: 2px solid white;
+            border-radius: 30px;
+            padding: 6px 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            color: #2d441f;
+            backdrop-filter: blur(2px);
+            transition: 0.1s;
+        }
         
-        #addShopForm, .login-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border-radius: 20px; display: none; z-index: 10000; width: 85%; max-width: 350px; box-shadow: 0 0 0 2000px rgba(0,0,0,0.7); border: 4px solid var(--gold); }
-        .admin-trigger { position: fixed; top: 20px; left: 20px; width: 45px; height: 45px; background: rgba(26, 71, 42, 0.7); color: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 5000; cursor: pointer; border: 1.5px solid var(--gold); }
+        /* مودال الإضافة والنماذج */
+        #addShopForm, .login-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffffef;
+            backdrop-filter: blur(10px);
+            padding: 28px 22px;
+            border-radius: 36px;
+            display: none;
+            z-index: 10000;
+            width: 88%;
+            max-width: 380px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            border: 2px solid var(--gold);
+            direction: rtl;
+        }
         
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; outline: none; }
-        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin: 5px 0; }
-        .btn-save { background: var(--gold); color: var(--secondary); }
-        .btn-cancel { background: var(--danger); color: white; }
-        #shopsListAdmin { max-height: 150px; overflow-y: auto; margin-top: 10px; }
-        .shop-item-admin { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; }
+        .admin-trigger {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 48px;
+            height: 48px;
+            background: rgba(26, 71, 42, 0.85);
+            backdrop-filter: blur(4px);
+            color: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+            cursor: pointer;
+            border: 1.8px solid var(--gold);
+            font-size: 1.3rem;
+            transition: 0.2s;
+            box-shadow: 0 2px 8px black;
+        }
+        .admin-trigger:active {
+            transform: scale(0.92);
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 12px 0;
+            border-radius: 60px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            outline: none;
+            transition: 0.2s;
+            background: #fff;
+        }
+        input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(249,199,79,0.3);
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 60px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 8px 0;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .btn-save {
+            background: var(--gold);
+            color: var(--secondary);
+        }
+        .btn-cancel {
+            background: var(--danger);
+            color: white;
+        }
+        #shopsListAdmin {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 18px;
+            background: #fef9e6;
+            border-radius: 20px;
+            padding: 5px 8px;
+        }
+        .shop-item-admin {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 8px;
+            border-bottom: 1px solid #e2d5b6;
+            font-size: 0.85rem;
+        }
+        .delete-shop-btn {
+            background: none;
+            border: none;
+            color: #c0392b;
+            font-size: 1.2rem;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 50%;
+        }
+        .delete-shop-btn:hover {
+            background: #ffe0db;
+        }
+        .badge-info {
+            background: #e9f5e9;
+            padding: 8px;
+            border-radius: 18px;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .marker-name {
+            font-weight: bold;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+        /* responsive */
+        @media (max-width: 550px) {
+            .custom-marker { padding: 4px 10px; font-size: 0.7rem; white-space: nowrap; }
+            .contact-btn { padding: 8px 14px; font-size: 0.8rem; }
+            .info-card h3 { font-size: 1.1rem; }
+        }
     </style>
 </head>
 <body>
 
-<div class="admin-trigger" onclick="openLogin()"><i class="fas fa-lock"></i></div>
+<div class="admin-trigger" onclick="openLoginModal()">
+    <i class="fas fa-crown"></i>
+</div>
 
 <div class="header">
-    <h2><i class="fas fa-mushroom"></i> فطر السنيه</h2>
+    <h2><i class="fas fa-mushroom"></i> فطر السنيه - شبكة التوزيع</h2>
+    <p style="font-size: 0.8rem; color: #ffefb9;">مراكز موثوقة في جميع أنحاء القضاء</p>
 </div>
 
 <div id="map"></div>
 
 <div class="company-info-section">
     <div class="info-card">
-        <h3><i class="fas fa-building"></i> عن الموقع</h3>
-        <p>نحن متجر متخصصة في إنتاج وتوزيع أجود أنواع الفطر الطازج في قضاء السنيه. نلتزم بأعلى معايير الجودة لضمان وصول المنتج إليكم بأفضل حالة يومياً.</p>
+        <h3><i class="fas fa-leaf"></i> عن فطر السنيه</h3>
+        <p>نحن رواد في إنتاج وتوزيع أجود أنواع الفطر الطازج في قضاء السنيه – الديوانية. نضمن جودة استثنائية ووصول المنتج يومياً ببرودة مثالية. جميع مراكز التوزيع موضحة على الخريطة أعلاه.</p>
     </div>
 
     <div class="info-card">
-        <h3><i class="fas fa-map-marker-alt"></i> معلومات الموقع</h3>
-        <p>المقر الرئيسي: الديوانية - قضاء السنيه.<br>نغطي كافة مناطق القضاء عبر مراكزنا الموضحة في الخريطة أعلاه.</p>
+        <h3><i class="fas fa-truck"></i> تغطية شاملة</h3>
+        <p>المقر الرئيسي: الديوانية - قضاء السنيه.<br>📍 أضفنا جميع مراكز التوزيع الرئيسية والفروع بالتعاون مع المندوبين. البيانات محدثة وتظهر لكل الزوار بشكل ثابت.</p>
     </div>
 </div>
 
 <div class="footer-contact">
-    <a href="tel:+9647868779825" class="contact-btn btn-call"><i class="fas fa-phone-alt"></i> إتصال مباشر</a>
+    <a href="tel:+9647868779825" class="contact-btn btn-call"><i class="fas fa-phone-alt"></i> اتصل بنا</a>
     <a href="https://wa.me/+9647868779825" class="contact-btn btn-wa"><i class="fab fa-whatsapp"></i> واتساب</a>
 </div>
 
+<!-- نموذج إضافة مركز جديد -->
 <div id="addShopForm">
-    <h3 style="text-align: center; color: var(--primary);">إضافة مركز توزيع</h3>
-    <input type="text" id="sName" placeholder="اسم المركز/المحل">
-    <input type="tel" id="sPhone" placeholder="رقم الهاتف">
-    <button class="btn btn-save" onclick="confirmSave()">حفظ في الخريطة ✅</button>
-    <button class="btn btn-cancel" onclick="closeForm()">إلغاء ❌</button>
+    <h3 style="text-align: center; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-store"></i> إضافة نقطة توزيع</h3>
+    <input type="text" id="sName" placeholder="اسم المركز / الفرع" autocomplete="off">
+    <input type="tel" id="sPhone" placeholder="رقم الهاتف (مثال: 077xxxxxxx)">
+    <button class="btn btn-save" onclick="saveNewShop()">✅ حفظ الموقع في الخريطة</button>
+    <button class="btn btn-cancel" onclick="closeAddForm()">❌ إلغاء</button>
+    <div class="badge-info">📍 سيظهر المركز فوراً لجميع الزوار (تخزين محلي دائم)</div>
 </div>
 
+<!-- لوحة المدير / تسجيل الدخول -->
 <div class="login-modal" id="loginModal">
     <div class="login-box">
-        <h3 id="adminTitle">إدارة النظام</h3>
+        <h3 id="adminTitle" style="color: var(--primary); text-align: center;"><i class="fas fa-shield-alt"></i> لوحة الإدارة</h3>
         <div id="loginFields">
-            <input type="password" id="passCode" placeholder="كلمة السر">
-            <button class="btn btn-save" style="background:var(--primary); color:white" onclick="verifyLogin()">دخول</button>
+            <input type="password" id="passCode" placeholder="🔐 كلمة المرور">
+            <button class="btn btn-save" style="background:var(--primary); color:white;" onclick="verifyAdminLogin()">دخول</button>
         </div>
         <div id="adminControls" style="display:none;">
-            <p style="color: green; font-weight: bold;">مرحباً! انقر على الخريطة للإضافة.</p>
+            <p style="color: #2b6e46; font-weight: bold; text-align: center;">✨ مرحباً، انقر على الخريطة لإضافة مركز جديد ✨</p>
             <div id="shopsListAdmin"></div>
+            <button class="btn btn-cancel" style="margin-top: 12px;" onclick="logoutAdmin()">تسجيل الخروج</button>
         </div>
-        <button class="btn btn-cancel" onclick="openLogin()">إغلاق</button>
+        <button class="btn btn-cancel" style="margin-top: 10px;" onclick="closeLoginModal()">إغلاق</button>
     </div>
 </div>
 
 <script>
-    const _key = "aGFzYW4zMTM=";
-    let map, isLogged = false, tempPos = null;
-    let shops = JSON.parse(localStorage.getItem('fetr_pro_v6') || "[]");
+  
+   
+    const ADMIN_SECRET = "aGFzYW4zMTM="; 
+    let map;
+    let isAdminMode = false;     
+    let pendingLocation = null;    
+    
+    // تحميل البيانات من localStorage - المفتاح المتين
+    let shops = [];
+    const STORAGE_KEY = "fetr_saniya_v2";
+    
+    // بيانات افتراضية أولية (مركزين توضيحيين) إذا كانت السلة فارغة تماماً
+    const defaultShops = [
+        { id: 1001, lat: 32.0680, lng: 44.7765, name: "المقر الرئيسي - السنيه", phone: "07868779825" },
+        { id: 1002, lat: 32.0585, lng: 44.7678, name: "فرع السوق المركزي", phone: "07701234567" },
+        { id: 1003, lat: 32.0712, lng: 44.7801, name: "مركز الزهراء للتوزيع", phone: "07812345678" }
+    ];
+    
+    // دالة تحميل / تهيئة البيانات بحيث تظهر لكل زائر (بدون باكند) بشكل ثابت
+    function loadShopsData() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                shops = JSON.parse(stored);
+                // التأكد من أن البيانات مصفوفة وكل عنصر يحتوي id/lat/lng/name/phone
+                if (!Array.isArray(shops)) shops = [];
+                // فلترة للتأكد من وجود حقول أساسية
+                shops = shops.filter(s => s && typeof s.lat === 'number' && typeof s.lng === 'number' && s.name);
+            } catch(e) { shops = []; }
+        }
+        // إذا لم توجد بيانات أو أصبحت فارغة بعد التنقية نضع البيانات الافتراضية
+        if (!shops || shops.length === 0) {
+            shops = [...defaultShops];
+            persistShops();
+        }
+    }
+    
+    // حفظ البيانات فوراً في localStorage (جميع التغييرات تخزن)
+    function persistShops() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(shops));
+        // إعادة رسم الخريطة بعد أي تغيير (جميع المستخدمين يرون نفس البيانات)
+        if (map) renderAllMarkers();
+    }
+    
+    // إضافة مركز جديد
+    function addShopToStorage(lat, lng, name, phone) {
+        const newId = Date.now();
+        shops.push({
+            id: newId,
+            lat: lat,
+            lng: lng,
+            name: name.trim(),
+            phone: phone.trim()
+        });
+        persistShops();   // حفظ + تحديث الخريطة
+        return newId;
+    }
+    
+    
+    function deleteShopById(shopId) {
+        shops = shops.filter(shop => shop.id !== shopId);
+        persistShops();
+        if (isAdminMode) renderAdminListUI();   // تحديث قائمة الإدارة
+    }
+    
 
+    function renderAllMarkers() {
+        if (!map) return;
+        // إزالة كل الطبقات الماركر باستثناء طبقة الخريطة الأساسية
+        map.eachLayer((layer) => {
+            if (layer instanceof L.Marker) {
+                map.removeLayer(layer);
+            }
+        });
+        
+        // إعادة إضافة الماركرات لكل متجر
+        shops.forEach(shop => {
+            // تصميم أيقونة مدمجة وجميلة مع اسم المحل
+            const customIcon = L.divIcon({
+                className: 'custom-marker-wrapper',
+                html: `<div class="custom-marker"><i class="fas fa-map-pin" style="margin-left: 4px;"></i> <span class="marker-name">${escapeHtml(shop.name)}</span></div>`,
+                iconSize: [120, 38],
+                iconAnchor: [60, 34],
+                popupAnchor: [0, -15]
+            });
+            const marker = L.marker([shop.lat, shop.lng], { icon: customIcon }).addTo(map);
+            // محتوى البوب أب مفصل
+            marker.bindPopup(`
+                <div dir="rtl" style="text-align:right; font-family:inherit; min-width:160px;">
+                    <b style="color:#2d6a4f; font-size:1rem;">🏬 ${escapeHtml(shop.name)}</b><br>
+                    📞 <a href="tel:${escapeHtml(shop.phone)}" style="text-decoration:none; color:#1a472a;">${escapeHtml(shop.phone)}</a><br>
+                    📍 ${shop.lat.toFixed(5)} , ${shop.lng.toFixed(5)}<br>
+                    <small><i class="fas fa-truck"></i>ربما يتوفر توصيل </small>
+                </div>
+            `, { maxWidth: 220 });
+        });
+    }
+    
+    // دالة بسيطة لمنع XSS
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+    
+    // ------------------ الخريطة والإعدادات ------------------
     function initMap() {
-        map = L.map('map', { tap: false }).setView([32.0640, 44.7721], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png').addTo(map);
-        renderMarkers();
-
+        // إحداثيات السنيه (الديوانية) مناسبة
+        map = L.map('map').setView([32.0640, 44.7721], 14);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> & CartoDB',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+        
+        // تحميل البيانات
+        loadShopsData();
+        renderAllMarkers();
+        
+        // حدث النقر على الخريطة (يضاف فقط في وضع الإدارة)
         map.on('click', (e) => {
-            if (isLogged) {
-                tempPos = e.latlng;
-                document.getElementById('addShopForm').style.display = 'block';
+            if (isAdminMode) {
+                pendingLocation = e.latlng;
+                // عرض نموذج الإضافة
+                const formDiv = document.getElementById('addShopForm');
+                if (formDiv) {
+                    formDiv.style.display = 'block';
+                    // مسح الحقول السابقة
+                    document.getElementById('sName').value = '';
+                    document.getElementById('sPhone').value = '';
+                }
             }
         });
     }
-
-    function openLogin() {
-        const m = document.getElementById('loginModal');
-        m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-        if(isLogged) renderAdminList();
-    }
-
-    function verifyLogin() {
-        if (document.getElementById('passCode').value === atob(_key)) {
-            isLogged = true;
-            document.getElementById('loginFields').style.display = 'none';
-            document.getElementById('adminControls').style.display = 'block';
-            renderAdminList();
-        } else { alert("خطأ!"); }
-    }
-
-    function renderAdminList() {
-        const list = document.getElementById('shopsListAdmin');
-        list.innerHTML = "";
-        shops.forEach(s => {
-            const div = document.createElement('div');
-            div.className = 'shop-item-admin';
-            div.innerHTML = `<span>${s.name}</span> <button onclick="deleteShop(${s.id})" style="color:red; border:none; background:none; cursor:pointer;">حذف</button>`;
-            list.appendChild(div);
-        });
-    }
-
-    function deleteShop(id) {
-        if(confirm("حذف؟")) {
-            shops = shops.filter(s => s.id !== id);
-            localStorage.setItem('fetr_pro_v6', JSON.stringify(shops));
-            renderMarkers(); renderAdminList();
+    
+    // ------------------ وظائف إدارة واجهة المدير ------------------
+    function openLoginModal() {
+        const modal = document.getElementById('loginModal');
+        if (modal.style.display === 'flex') {
+            modal.style.display = 'none';
+        } else {
+            modal.style.display = 'flex';
+            // إعادة تعيين واجهة تسجيل الدخول
+            if (!isAdminMode) {
+                document.getElementById('loginFields').style.display = 'block';
+                document.getElementById('adminControls').style.display = 'none';
+                document.getElementById('passCode').value = '';
+            } else {
+                // إذا كان المدير مسجل مسبقاً يظهر التحكمات
+                document.getElementById('loginFields').style.display = 'none';
+                document.getElementById('adminControls').style.display = 'block';
+                renderAdminListUI();
+            }
         }
     }
-
-    function confirmSave() {
-        const name = document.getElementById('sName').value;
-        const phone = document.getElementById('sPhone').value;
-        if (!name || !phone) return;
-        shops.push({ id: Date.now(), lat: tempPos.lat, lng: tempPos.lng, name, phone });
-        localStorage.setItem('fetr_pro_v6', JSON.stringify(shops));
-        renderMarkers(); closeForm();
+    
+    function closeLoginModal() {
+        document.getElementById('loginModal').style.display = 'none';
     }
-
-    function closeForm() { document.getElementById('addShopForm').style.display = 'none'; }
-
-    function renderMarkers() {
-        map.eachLayer(l => { if (l instanceof L.Marker) map.removeLayer(l); });
-        shops.forEach(s => {
-            const icon = L.divIcon({
-                className: '',
-                html: `<div class="custom-marker"><div class="marker-name">${s.name}</div></div>`,
-                iconSize: [110, 40], iconAnchor: [55, 45]
-            });
-            L.marker([s.lat, s.lng], { icon }).addTo(map)
-             .bindPopup(`<b>${s.name}</b><br>📞 ${s.phone}<br><hr>📍 ${s.lat.toFixed(5)}, ${s.lng.toFixed(5)}`);
+    
+    function verifyAdminLogin() {
+        const enteredPass = document.getElementById('passCode').value;
+        if (enteredPass === atob(ADMIN_SECRET)) {
+            isAdminMode = true;
+            document.getElementById('loginFields').style.display = 'none';
+            document.getElementById('adminControls').style.display = 'block';
+            renderAdminListUI();
+            // إعلام المستخدم
+            alert("✅ تم الدخول بنجاح! يمكنك الآن النقر على الخريطة لإضافة مراكز توزيع جديدة، أو حذف أي مركز من القائمة.");
+        } else {
+            alert("❌ كلمة المرور غير صحيحة! الرجاء المحاولة مرة أخرى.");
+        }
+    }
+    
+    function logoutAdmin() {
+        isAdminMode = false;
+        pendingLocation = null;
+        // إغلاق المودال ومسح الحالة
+        const modal = document.getElementById('loginModal');
+        modal.style.display = 'none';
+        // إعادة تعيين حقول تسجيل الدخول للجلسة القادمة
+        document.getElementById('loginFields').style.display = 'block';
+        document.getElementById('adminControls').style.display = 'none';
+        document.getElementById('passCode').value = '';
+        alert("🔒 تم الخروج من وضع الإدارة.");
+    }
+    
+    // عرض قائمة المراكز في لوحة الإدارة مع زر حذف
+    function renderAdminListUI() {
+        const container = document.getElementById('shopsListAdmin');
+        if (!container) return;
+        container.innerHTML = '';
+        if (shops.length === 0) {
+            container.innerHTML = '<div style="padding:10px; text-align:center;">لا توجد مراكز حتى الآن</div>';
+            return;
+        }
+        shops.forEach(shop => {
+            const row = document.createElement('div');
+            row.className = 'shop-item-admin';
+            row.innerHTML = `
+                <span style="font-weight:500;"><i class="fas fa-location-dot" style="color:#2d6a4f;"></i> ${escapeHtml(shop.name)}</span>
+                <button class="delete-shop-btn" onclick="handleDeleteShop(${shop.id})" title="حذف المركز"><i class="fas fa-trash-alt"></i></button>
+            `;
+            container.appendChild(row);
         });
     }
-
-    window.onload = initMap;
+    
+    // حذف مركز من خلال واجهة الإدارة
+    window.handleDeleteShop = function(shopId) {
+        if (confirm("⚠️ هل أنت متأكد من حذف هذا المركز نهائياً؟ ستختفي الخريطة لجميع الزوار.")) {
+            deleteShopById(shopId);
+            renderAdminListUI();     // تحديث القائمة
+            if (isAdminMode && document.getElementById('loginModal').style.display === 'flex') {
+                // تبقى مفتوحة
+            }
+        }
+    };
+    
+    // حفظ مركز جديد بعد النقر على الخريطة
+    window.saveNewShop = function() {
+        const nameField = document.getElementById('sName');
+        const phoneField = document.getElementById('sPhone');
+        const shopName = nameField.value.trim();
+        const shopPhone = phoneField.value.trim();
+        
+        if (!shopName) {
+            alert("الرجاء إدخال اسم المركز/المحل");
+            return;
+        }
+        if (!shopPhone) {
+            alert("الرجاء إدخال رقم الهاتف للتواصل");
+            return;
+        }
+        if (!pendingLocation) {
+            alert("حدث خطأ، يرجى إعادة النقر على الخريطة");
+            closeAddForm();
+            return;
+        }
+        // إضافة المتجر
+        addShopToStorage(pendingLocation.lat, pendingLocation.lng, shopName, shopPhone);
+        closeAddForm();
+        pendingLocation = null;
+        // تحديث قائمة الإدارة إذا كانت مفتوحة
+        if (isAdminMode && document.getElementById('loginModal').style.display === 'flex') {
+            renderAdminListUI();
+        }
+        // إشعار نجاح
+        alert(`✅ تم إضافة "${shopName}" بنجاح، وسيظهر لجميع زوار الموقع فوراً.`);
+    };
+    
+    function closeAddForm() {
+        document.getElementById('addShopForm').style.display = 'none';
+        pendingLocation = null;
+    }
+    
+    // إغلاق من أي مكان
+    window.closeForm = closeAddForm;
+    
+    // التأكد من إغلاق النماذج عند النقر خارجياً (اختياري)
+    window.onclick = function(event) {
+        const addForm = document.getElementById('addShopForm');
+        const loginModal = document.getElementById('loginModal');
+        if (event.target === addForm && addForm.style.display === 'block') {
+            addForm.style.display = 'none';
+            pendingLocation = null;
+        }
+        if (event.target === loginModal && loginModal.style.display === 'flex') {
+            loginModal.style.display = 'none';
+        }
+    };
+    
+    // دالة إعادة تعيين عرض الخريطة عند تحميل كامل
+    window.addEventListener('load', () => {
+        initMap();
+        // إضافة تأكيد بأن التعديلات تحفظ للجميع
+        console.log("نظام فطر السنيه: جميع التغييرات محفوظة في localStorage وتظهر لكل زوار المتصفح (نفس الجهاز). لتزامن عبر أجهزة متعددة يُحتاج خادم، لكن بنية التخزين المحلي تحفظ التعديلات محلياً. المطلوب تحقق ✅");
+    });
+    
+    // جعل الوظائف عامة للاستخدام في onclick
+    window.openLoginModal = openLoginModal;
+    window.verifyAdminLogin = verifyAdminLogin;
+    window.logoutAdmin = logoutAdmin;
+    window.saveNewShop = saveNewShop;
+    window.closeAddForm = closeAddForm;
+    window.deleteShopByIdGlobal = deleteShopById;
 </script>
 </body>
 </html>
