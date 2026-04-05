@@ -3,75 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>فطر السنيه - النظام السحابي</title>
+    <title>دليل مطاعم السنية</title>
     
+    <!-- مكتبة الخرائط Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- مكتبة الأيقونات FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
-        :root { --primary: #2d6a4f; --secondary: #1a472a; --gold: #f9c74f; --beige: #f8f3e0; --danger: #c4452c; --white: #ffffff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--secondary); min-height: 100vh; display: flex; flex-direction: column; color: #333; overflow-x: hidden; }
-        .header { background: var(--primary); color: var(--gold); padding: 15px; text-align: center; border-bottom: 3px solid var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; }
-        #map { height: 380px; width: 100%; z-index: 1; background: #eee; border-bottom: 2px solid var(--gold); }
-        .company-info-section { background: var(--beige); padding: 20px; flex-grow: 1; border-top: 5px solid var(--primary); }
-        .info-card { background: var(--white); border-radius: 15px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 15px; border-right: 5px solid var(--gold); }
-        .info-card h3 { color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .info-card p { font-size: 0.95rem; line-height: 1.6; color: #555; }
-        .footer-contact { background: var(--white); padding: 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #ddd; position: sticky; bottom: 0; width: 100%; z-index: 100; }
-        .contact-btn { text-decoration: none; color: white; font-weight: bold; padding: 12px 25px; border-radius: 25px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
-        .btn-call { background: var(--primary); }
+        :root { 
+            --primary: #d35400; /* لون برتقالي دافئ للمطاعم */
+            --secondary: #2c3e50; /* لون داكن للتفاصيل */
+            --gold: #f39c12; 
+            --light-bg: #fdf8f5; 
+            --danger: #e74c3c; 
+            --white: #ffffff; 
+            --success: #27ae60;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--light-bg); min-height: 100vh; display: flex; flex-direction: column; color: #333; overflow-x: hidden; }
+        
+        .header { 
+            background: var(--primary); 
+            color: var(--white); 
+            padding: 18px; 
+            text-align: center; 
+            border-bottom: 4px solid var(--gold); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            z-index: 100; 
+        }
+        .header h2 { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        #map { height: 450px; width: 100%; z-index: 1; border-bottom: 3px solid var(--primary); background: #e5e3df; }
+        
+        .company-info-section { background: var(--white); padding: 25px 20px; flex-grow: 1; }
+        .info-card { 
+            background: #fff; 
+            border-radius: 15px; 
+            padding: 20px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06); 
+            margin-bottom: 15px; 
+            border-right: 5px solid var(--primary); 
+        }
+        .info-card h3 { color: var(--secondary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-size: 1.2rem; }
+        .info-card p { font-size: 1rem; line-height: 1.7; color: #666; }
+        
+        .footer-contact { 
+            background: var(--white); 
+            padding: 15px; 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            border-top: 1px solid #eee; 
+            position: sticky; 
+            bottom: 0; 
+            width: 100%; 
+            z-index: 100; 
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+        .contact-btn { text-decoration: none; color: white; font-weight: bold; padding: 12px 25px; border-radius: 25px; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; transition: transform 0.2s;}
+        .contact-btn:active { transform: scale(0.95); }
+        .btn-call { background: var(--secondary); }
         .btn-wa { background: #25D366; }
-        .custom-marker { background: var(--gold); border: 2px solid white; border-radius: 8px; padding: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); text-align: center; position: relative; width: 110px !important; font-weight: bold; font-size: 12px; color: var(--secondary); }
-        .custom-marker::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid var(--gold); }
-        #addShopForm, .login-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border-radius: 20px; display: none; z-index: 10000; width: 85%; max-width: 350px; box-shadow: 0 0 0 2000px rgba(0,0,0,0.8); border: 4px solid var(--gold); flex-direction: column; }
-        .admin-trigger { position: fixed; top: 20px; left: 20px; width: 45px; height: 45px; background: rgba(26, 71, 42, 0.7); color: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 5000; cursor: pointer; border: 1.5px solid var(--gold); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; }
-        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin: 5px 0; }
-        .btn-save { background: var(--gold); color: var(--secondary); }
-        .btn-cancel { background: var(--danger); color: white; }
-        #shopsListAdmin { max-height: 150px; overflow-y: auto; margin-top: 10px; border: 1px solid #eee; padding: 5px; }
-        .shop-item-admin { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; font-size: 14px; }
+        
+        /* تصميم أيقونة التحديد (الـ Marker) بشكل جذاب */
+        .custom-marker { 
+            background: var(--white); 
+            border: 2px solid var(--primary); 
+            border-radius: 30px; 
+            padding: 6px 12px; 
+            box-shadow: 0 5px 15px rgba(211, 84, 0, 0.4); 
+            text-align: center; 
+            position: relative; 
+            width: auto !important; 
+            min-width: 90px;
+            font-weight: bold; 
+            font-size: 13px; 
+            color: var(--secondary); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .custom-marker i { color: var(--primary); font-size: 14px; }
+        .custom-marker:hover { transform: translateY(-5px); z-index: 1000 !important; box-shadow: 0 8px 20px rgba(211, 84, 0, 0.6); }
+        .custom-marker::after { 
+            content: ''; 
+            position: absolute; 
+            bottom: -8px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            border-left: 8px solid transparent; 
+            border-right: 8px solid transparent; 
+            border-top: 8px solid var(--primary); 
+        }
+
+        /* تنسيق النوافذ المنبثقة للخرائط (Leaflet Popups) */
+        .leaflet-popup-content-wrapper { border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .leaflet-popup-content { margin: 15px; line-height: 1.6; }
+
+        /* نوافذ الإدارة والإضافة */
+        #addShopForm, .login-modal { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background: white; padding: 25px; border-radius: 20px; display: none; 
+            z-index: 10000; width: 90%; max-width: 380px; 
+            box-shadow: 0 0 0 2000px rgba(0,0,0,0.6); border: 3px solid var(--primary); 
+            flex-direction: column; gap: 10px;
+        }
+        .admin-trigger { 
+            position: fixed; top: 20px; left: 20px; width: 45px; height: 45px; 
+            background: rgba(255, 255, 255, 0.9); color: var(--primary); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            z-index: 5000; cursor: pointer; border: 2px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        input { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ddd; font-size: 15px; background: #fafafa; transition: border 0.3s; }
+        input:focus { border-color: var(--primary); outline: none; background: #fff; }
+        .input-group { position: relative; }
+        .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
+        .input-group input { padding-left: 40px; }
+
+        .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; font-size: 15px; cursor: pointer; transition: background 0.3s; }
+        .btn-save { background: var(--primary); color: white; margin-top: 10px; }
+        .btn-save:hover { background: #b84a00; }
+        .btn-cancel { background: #eee; color: #555; }
+        .btn-cancel:hover { background: #ddd; }
+
+        #shopsListAdmin { max-height: 200px; overflow-y: auto; margin-top: 15px; border: 1px solid #eee; border-radius: 10px; }
+        .shop-item-admin { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .shop-item-admin:last-child { border-bottom: none; }
+        .btn-delete { color: var(--danger); background: rgba(231, 76, 60, 0.1); border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="admin-trigger" onclick="openLogin()"><i class="fas fa-lock"></i></div>
-<div class="header"><h2><i class="fas fa-mushroom"></i> فطر السنيه</h2></div>
+<div class="admin-trigger" onclick="openLogin()"><i class="fas fa-cog"></i></div>
+<div class="header"><h2><i class="fas fa-utensils"></i> دليل مطاعم السنية</h2></div>
 <div id="map"></div>
 
 <div class="company-info-section">
     <div class="info-card">
-        <h3><i class="fas fa-building"></i> عن المشروع</h3>
-        <p>تجهيز وتوزيع الفطر الطازج يومياً في قضاء السنيه. نضمن لكم الجودة والطعم المميز.</p>
+        <h3><i class="fas fa-info-circle"></i> عن الدليل</h3>
+        <p>دليلك الشامل لاكتشاف أفضل المطاعم وأماكن تقديم الطعام في قضاء السنية. استعرض المواقع، تواصل معهم مباشرة، وتعرف على أوقات العمل.</p>
     </div>
 </div>
 
 <div class="footer-contact">
-    <a href="tel:+9647868779825" class="contact-btn btn-call"><i class="fas fa-phone-alt"></i> إتصال</a>
+    <!-- يمكنك تغيير هذه الأرقام إلى رقم الإدارة أو تركها للدعم -->
+    <a href="tel:+9647868779825" class="contact-btn btn-call"><i class="fas fa-phone-alt"></i> إتصال بالإدارة</a>
     <a href="https://wa.me/+9647868779825" class="contact-btn btn-wa"><i class="fab fa-whatsapp"></i> واتساب</a>
 </div>
 
+<!-- نموذج إضافة مطعم جديد -->
 <div id="addShopForm">
-    <h3 style="text-align: center;">إضافة موقع جديد</h3>
-    <input type="text" id="sName" placeholder="اسم المحل/الوكيل">
-    <input type="tel" id="sPhone" placeholder="رقم الموبايل">
-    <button class="btn btn-save" onclick="confirmSave()">حفظ في السيرفر ✅</button>
+    <h3 style="text-align: center; color: var(--secondary); margin-bottom: 10px;">إضافة مطعم جديد</h3>
+    
+    <div class="input-group">
+        <i class="fas fa-store"></i>
+        <input type="text" id="sName" placeholder="اسم المطعم">
+    </div>
+    <div class="input-group">
+        <i class="fas fa-mobile-alt"></i>
+        <input type="tel" id="sPhone" placeholder="رقم الهاتف">
+    </div>
+    <div class="input-group">
+        <i class="far fa-clock"></i>
+        <input type="text" id="sHours" placeholder="ساعات العمل (مثال: 10 ص - 12 م)">
+    </div>
+    <div class="input-group">
+        <i class="fab fa-instagram"></i>
+        <input type="text" id="sInsta" placeholder="يوزر الانستا أو الرابط (اختياري)">
+    </div>
+
+    <button class="btn btn-save" onclick="confirmSave()"><i class="fas fa-cloud-upload-alt"></i> حفظ وإضافة للخريطة</button>
     <button class="btn btn-cancel" onclick="closeForm()">إلغاء</button>
 </div>
 
+<!-- نموذج لوحة التحكم (الادمن) -->
 <div class="login-modal" id="loginModal">
-    <h3 style="text-align:center">لوحة التحكم</h3>
+    <h3 style="text-align:center; color: var(--secondary); margin-bottom: 15px;"><i class="fas fa-lock"></i> لوحة الإدارة</h3>
     <div id="loginFields">
-        <input type="password" id="passCode" placeholder="كلمة السر">
-        <button class="btn btn-save" onclick="verifyLogin()">دخول</button>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <i class="fas fa-key"></i>
+            <input type="password" id="passCode" placeholder="كلمة المرور">
+        </div>
+        <button class="btn btn-save" onclick="verifyLogin()">تسجيل الدخول</button>
     </div>
     <div id="adminControls" style="display:none;">
-        <p style="color: green; font-size: 13px; text-align: center;">تم التفعيل: انقر على الخريطة للإضافة</p>
+        <div style="background: rgba(39, 174, 96, 0.1); color: var(--success); padding: 10px; border-radius: 8px; text-align: center; font-size: 13px; margin-bottom: 10px;">
+            <i class="fas fa-check-circle"></i> تم التفعيل: انقر على أي مكان في الخريطة لإضافة مطعم.
+        </div>
+        <h4 style="color: var(--secondary); margin-top: 10px;">المطاعم المضافة:</h4>
         <div id="shopsListAdmin"></div>
     </div>
-    <button class="btn btn-cancel" onclick="openLogin()">إغلاق</button>
+    <button class="btn btn-cancel" style="margin-top: 10px;" onclick="openLogin()">إغلاق</button>
 </div>
 
 <script type="module">
@@ -93,15 +220,21 @@
     // تشغيل Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const shopsRef = ref(db, 'locations'); // اسم المجلد في قاعدة البيانات
+    const shopsRef = ref(db, 'restaurants'); // تم التغيير إلى restaurants
 
     const _key = "aGFzYW4zMTM="; // كلمة السر: hasan313
     let map, isLogged = false, tempPos = null, shops = [];
 
     // دالة تهيئة الخريطة
     window.initMap = function() {
+        // مركز الخريطة على قضاء السنية
         map = L.map('map', { tap: false }).setView([32.0640, 44.7721], 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png').addTo(map);
+        
+        // ستايل جميل للخريطة
+        L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
 
         map.on('click', (e) => {
             if (isLogged) {
@@ -125,27 +258,54 @@
             document.getElementById('loginFields').style.display = 'none';
             document.getElementById('adminControls').style.display = 'block';
             renderAdminList();
-        } else { alert("كلمة السر خاطئة!"); }
+        } else { 
+            alert("كلمة السر خاطئة!"); 
+        }
     };
 
     window.confirmSave = function() {
-        const name = document.getElementById('sName').value;
-        const phone = document.getElementById('sPhone').value;
-        if (!name || !phone) { alert("أدخل البيانات كاملة"); return; }
+        const name = document.getElementById('sName').value.trim();
+        const phone = document.getElementById('sPhone').value.trim();
+        const hours = document.getElementById('sHours').value.trim();
+        let insta = document.getElementById('sInsta').value.trim();
+
+        if (!name || !phone) { 
+            alert("الرجاء إدخال اسم المطعم ورقم الهاتف على الأقل."); 
+            return; 
+        }
+        
+        // معالجة رابط الانستغرام لضمان عمله كـ URL
+        if(insta && !insta.startsWith('http')) {
+            insta = insta.replace('@', '');
+            insta = `https://instagram.com/${insta}`;
+        }
         
         const id = Date.now();
         // الحفظ في Firebase
-        set(ref(db, 'locations/' + id), { id, lat: tempPos.lat, lng: tempPos.lng, name, phone })
+        set(ref(db, 'restaurants/' + id), { 
+            id, 
+            lat: tempPos.lat, 
+            lng: tempPos.lng, 
+            name, 
+            phone,
+            hours: hours || '',
+            insta: insta || ''
+        })
         .then(() => {
             closeForm();
+            // تصفير الحقول بعد الإضافة
             document.getElementById('sName').value = '';
             document.getElementById('sPhone').value = '';
+            document.getElementById('sHours').value = '';
+            document.getElementById('sInsta').value = '';
+        }).catch(err => {
+            alert("حدث خطأ أثناء الحفظ: " + err.message);
         });
     };
 
     window.deleteShop = function(id) {
-        if(confirm("هل تريد حذف هذا الموقع نهائياً؟")) {
-            remove(ref(db, 'locations/' + id));
+        if(confirm("هل أنت متأكد من حذف هذا المطعم نهائياً؟")) {
+            remove(ref(db, 'restaurants/' + id));
         }
     };
 
@@ -155,23 +315,63 @@
         map.eachLayer(l => { if (l instanceof L.Marker) map.removeLayer(l); });
         
         shops.forEach(s => {
+            // تصميم أيقونة الخريطة
             const icon = L.divIcon({
                 className: '',
-                html: `<div class="custom-marker">${s.name}</div>`,
-                iconSize: [110, 40], iconAnchor: [55, 45]
+                html: `<div class="custom-marker"><i class="fas fa-utensils"></i> ${s.name}</div>`,
+                iconSize: [null, 40], // الحجم يتحدد تلقائيا حسب النص
+                iconAnchor: [45, 45],
+                popupAnchor: [0, -40]
             });
-            L.marker([s.lat, s.lng], { icon }).addTo(map)
-             .bindPopup(`<b>${s.name}</b><br>📞 ${s.phone}<br><a href="https://www.google.com/maps?q=${s.lat},${s.lng}" target="_blank">فتح في خرائط جوجل</a>`);
+
+            // تصميم محتوى النافذة المنبثقة (Popup)
+            let popupHTML = `
+                <div style="text-align: right; min-width: 180px;">
+                    <h3 style="color: var(--primary); margin-bottom: 10px; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                        <i class="fas fa-utensils"></i> ${s.name}
+                    </h3>
+                    <div style="font-size: 14px; color: #444; line-height: 2;">
+                        <div><i class="fas fa-phone-alt" style="color: var(--success); width: 20px;"></i> <a href="tel:${s.phone}" style="text-decoration: none; color: #333; font-weight: bold; direction: ltr; display: inline-block;">${s.phone}</a></div>
+            `;
+            
+            if(s.hours) {
+                popupHTML += `<div><i class="far fa-clock" style="color: var(--gold); width: 20px;"></i> ${s.hours}</div>`;
+            }
+            
+            if(s.insta) {
+                popupHTML += `<div><i class="fab fa-instagram" style="color: #e1306c; width: 20px;"></i> <a href="${s.insta}" target="_blank" style="text-decoration: none; color: #e1306c; font-weight: bold;">حساب الانستغرام</a></div>`;
+            }
+
+            popupHTML += `
+                        <div style="margin-top: 12px; text-align: center;">
+                            <a href="https://www.google.com/maps?q=${s.lat},${s.lng}" target="_blank" style="background: #3498db; color: white; padding: 8px 12px; border-radius: 8px; text-decoration: none; display: block; font-size: 13px;">
+                                <i class="fas fa-map-marker-alt"></i> فتح في خرائط جوجل
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            L.marker([s.lat, s.lng], { icon }).addTo(map).bindPopup(popupHTML);
         });
     }
 
     window.renderAdminList = function() {
         const list = document.getElementById('shopsListAdmin');
         list.innerHTML = "";
+        
+        if (shops.length === 0) {
+            list.innerHTML = "<div style='padding: 10px; text-align: center; color: #888;'>لا توجد مطاعم مضافة بعد</div>";
+            return;
+        }
+
         shops.forEach(s => {
             const div = document.createElement('div');
             div.className = 'shop-item-admin';
-            div.innerHTML = `<span>${s.name}</span> <button onclick="deleteShop(${s.id})" style="color:red; border:none; background:none; cursor:pointer;">حذف</button>`;
+            div.innerHTML = `
+                <strong><i class="fas fa-utensils" style="color:#d35400"></i> ${s.name}</strong> 
+                <button class="btn-delete" onclick="deleteShop(${s.id})"><i class="fas fa-trash-alt"></i> حذف</button>
+            `;
             list.appendChild(div);
         });
     };
@@ -180,8 +380,10 @@
         const modal = document.getElementById('loginModal');
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex'; 
     };
+    
     window.closeForm = () => { document.getElementById('addShopForm').style.display = 'none'; };
 
+    // تشغيل الخريطة عند تحميل الصفحة
     window.onload = initMap;
 </script>
 </body>
